@@ -1,0 +1,60 @@
+\chapter{Requirements and Analysis}
+\label{chapter: 3}
+
+This chapter outlines the aims and objectives for the project, classifying them by desirability. Following this each objective is described in greater detail.
+
+\section{Aims and Objectives}
+\label{section: aims and objectives}
+
+\begin{itemize}
+    \item[] \textbf{Essential}
+    \item Calibrate MiRo's onboard cameras 
+    \item Perform object detection of the ball
+    \item Convert from image space to world space
+    \item Predict the free movement of the ball
+    \item Measure the ball velocity
+    \item[] \textbf{Desirable}
+    \item Use sensor fusion to improve accuracy
+    \item[] \textbf{Optional}
+    \item Predict bounces on the trajectory
+\end{itemize}
+
+\section{Camera Calibration}
+
+The MiRo has two cameras with fish-eye lenses. These will need to be calibrated so that the distortion effect can be removed from the image, and shapes such as the circle of the ball  will be less stretched and therefore easier to detect. 
+
+The calibration can be evaluated using the reprojection error. This is the distance between the projected points and measured points, with minimisation of the error showing a more accurate calibration. 
+
+\section{Ball Detection}
+
+It is necessary to build a robust algorithm for detecting the position of the ball in an image. Due to the limited processing power of the MiRo robots it is not feasible to use a neural network such as a CNN, so a non-neural method will have to be implemented.
+
+The first task is to implement an efficient algorithm to search the entire camera output for regions of interest, i.e. ball candidates. It is important for this algorithm to produce very few false negatives, as the rest of the image will be discarded at this point. The effectiveness of this algorithm could also be improved by first applying some preprocessing to the image. 
+
+The next task is to implement a system to filter out any false positives from the set of ball candidates. Common solutions to this problem are to use a feature detection algorithm together with a classifier, or to use some heuristics about the pattern or geometry of the ball. 
+
+To evaluate the effectiveness of the ball detection, a labelled test set will be created using images from realistic robot football scenarios. Some evaluation metrics that will be useful are precision, recall and AUC (area under the receiving operator characteristics curve). 
+
+\section{Image to World Space}
+
+In order to reason about the state of the game, it is necessary to calculate the position of the ball in world space. This can be estimated using the current pose of the MiRo, including the direction that the head is looking in as well as the distance to the ball. 
+
+\section{Measuring the Ball Velocity}
+
+In order to begin to estimate the trajectory of the ball, it is required to know its current velocity. A common approach to this problem is to keep a list of previous ball positions at constant time intervals which can be used to estimate velocity.
+
+\section{Sensor Fusion}
+
+In order to make use of MiRo's stereo vision, it would be useful to combine observations from both cameras to improve the accuracy of ball detection. 
+
+As well as this, in the likely case where the ball is not within the robot's vision, it would be very helpful for the position of the ball to be supplied by its teammates. It is also likely that a robot's estimated ball position may not be accurate, especially if the ball is too close, too far away or partially obscured. Therefore it would be useful to combine each team member's estimated ball position in a probabilistic way to increase overall system accuracy.
+
+\section{Predicting Trajectory}
+
+The system will assume that the ball does not leave the ground due to the added complexity of modelling 3 dimensions compared to the amount of time that the ball is likely to actually spend in the air. The trajectory prediction should take into account factors such as friction and should be able to estimate the stopping point of the ball. 
+
+The trajectory prediction can be evaluated by rolling a ball across the robots view and comparing the estimated position after $t$ seconds to the actual position at this time. This is easier in simulation as the position of the ball is exactly known, however it would be more useful to have results of a real-life prediction. The ball detection algorithm can be used for this purpose however it will have to be noted that the evaluation can be affected by the accuracy of detection. 
+
+\section{Predicting Bounces}
+
+It would be helpful to model the effects of bounces against the surrounding walls to allow the players to move towards the ball more accurately. It could also be useful to predict whether the ball will bounce off any of the other players, although it this would be much more unpredictable and therefore much harder to accurately model. 

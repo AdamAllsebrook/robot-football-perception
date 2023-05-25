@@ -1,0 +1,29 @@
+<launch>
+    <!-- Spawn a MiRo -->
+    
+    <arg name="miro_ns"/>
+    <arg name="init_pose"/>
+    <arg name="debug"/>
+    <arg name="gazebo_ns"/>
+    <arg name="chase_ball" default="-1"/>
+
+    <group ns="$(arg miro_ns)">
+        <node name="spawn_miro" pkg="gazebo_ros" type="spawn_model" 
+            args="-sdf -model $(arg miro_ns) -file $(optenv MIRO_DIR_MDK)/sim/models/miro_model/miro_model.sdf 
+                -gazebo_namespace /$(arg gazebo_ns) $(arg init_pose)" />
+
+        <node pkg="miro_football_perception" type="ball_vision.py" name="ball_vision" output="screen" args="$(arg debug)"></node>
+        <node pkg="miro_football_perception" type="image_to_world.py" name="image_to_world" output="screen"></node>
+        <node pkg="miro_football_perception" type="look_at_ball.py" name="look_at_ball" output="screen" args="$(arg chase_ball)"></node>
+        <node pkg="miro_football_perception" type="read_observations.py" name="read_observations" output="screen"></node>
+        <node pkg="miro_football_perception" type="estimate_velocity.py" name="estimate_velocity" output="screen"></node>
+        <node pkg="miro_football_perception" type="ball_trajectory.py" name="ball_trajectory" output="screen"></node>
+
+        <group if="$(arg debug)">
+            <node pkg="miro_football_perception" type="debug_camera.py" name="debug_camera" output="screen"></node>
+            <node pkg="miro_football_perception" type="debug_balls.py" name="debug_accepted_balls" output="screen" args="accept"></node>
+            <node pkg="miro_football_perception" type="debug_balls.py" name="debug_rejected_balls" output="screen" args="reject"></node>
+            <node pkg="miro_football_perception" type="debug_pitch.py" name="debug_pitch" output="screen"></node>
+        </group>
+    </group>
+</launch>

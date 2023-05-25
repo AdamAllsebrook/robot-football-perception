@@ -1,0 +1,30 @@
+<launch>
+    <arg name="gazebo_ns" default="gazebo"/>
+    <arg name="debug" default="false"/>
+    <arg name="loop" default="1"/>
+
+    <include file="$(find miro_football_perception)/launch/gazebo.launch">
+        <arg name="gazebo_ns" value="$(arg gazebo_ns)"/>
+        <arg name="world" value="$(find miro_football_perception)/sim/worlds/football_clone.world"/>
+    </include>
+
+    <include file="$(find miro_football_perception)/launch/miro.launch">
+        <arg name="miro_ns" value="miro1"/>
+        <arg name="init_pose" value="-x 0 -y 0 -z 0 -Y 0"/>
+        <arg name="gazebo_ns" value="$(arg gazebo_ns)"/>
+        <arg name="debug" value="$(arg debug)"/>
+    </include>
+
+    <!-- <include file="$(find miro_football_perception)/launch/miro.launch">
+        <arg name="miro_ns" value="miro2"/>
+        <arg name="init_pose" value="-x 1 -y 1 -z 0 -Y 3.14"/>
+        <arg name="gazebo_ns" value="$(arg gazebo_ns)"/>
+        <arg name="debug" value="$(arg debug)"/>
+    </include> -->
+
+    <node pkg="miro_football_perception" type="publish_sim_ball.py" name="publish_sim_ball" output="screen"></node>
+    <node pkg="miro_football_perception" type="set_sim_object.py" name="set_sim_object" output="screen" ></node>
+
+    <node pkg="miro_football_perception" type="scenarios.py" name="scenarios" output="screen" args="$(arg loop)"></node>
+    
+</launch>

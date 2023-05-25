@@ -1,0 +1,5 @@
+sensor_msgs/Image ros_image
+---
+bool result
+---
+bool feedback

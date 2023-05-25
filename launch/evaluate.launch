@@ -1,0 +1,56 @@
+<launch>
+
+    <!-- Add custom Gazebo paths -->
+    <env name="GAZEBO_MODEL_PATH"
+        value="$(find miro_football_perception)/sim/models:$(optenv MIRO_DIR_MDK)/sim/models:$(optenv GAZEBO_MODEL_PATH)" />
+    <env name="GAZEBO_RESOURCE_PATH"
+        value="$(optenv MIRO_DIR_MDK)/sim:$(optenv GAZEBO_RESOURCE_PATH)" />
+    <env name="GAZEBO_PLUGIN_PATH"
+        value="$(optenv MIRO_DIR_MDK)/bin/${MIRO_SYSTEM}:$(optenv GAZEBO_PLUGIN_PATH)" />
+
+    <!-- Specify which .world file to load -->
+    <arg name="world" default="$(find miro_football_perception)/sim/worlds/test.world"/>
+
+    <!-- start Gazebo server with exposed ROS interface-->
+    <arg name="gazebo_ns" default="gazebo" doc="Gazebo namespace, typically 'gazebo' or 'gazebo_server'" />
+    <node name="$(arg gazebo_ns)"
+        pkg="gazebo_ros"
+        type="gzserver"
+        respawn="false"
+        required="true"
+        args="--physics ode --verbose $(arg world)"
+    />
+    <!-- Start Gazebo client -->
+    <node name="gazebo_gui"
+        pkg="gazebo_ros"
+        type="gzclient"
+        respawn="true"
+    />
+
+    <!-- Spawn a MiRo -->
+    <arg name="miro_football_ns" default="miro" doc="namespace (prefix) for 'pacman' robot" />
+    <group ns="$(arg miro_football_ns)">
+        <arg name="x_miro" default="0.0"/>
+        <arg name="y_miro" default="0.0"/>
+        <arg name="z_miro" default="0"/>
+        <arg name="Y_miro" default="0"/>
+
+        <node name="spawn_miro" pkg="gazebo_ros" type="spawn_model" ns="$(arg miro_football_ns)" 
+            args="-sdf -model $(arg miro_football_ns) -file $(optenv MIRO_DIR_MDK)/sim/models/miro_model/miro_model.sdf -gazebo_namespace /$(arg gazebo_ns) -x $(arg x_miro) -y $(arg y_miro) -z $(arg z_miro) -Y $(arg Y_miro)" />
+
+        <node pkg="miro_football_perception" type="ball_vision.py" name="ball_vision" output="screen" args="debug"></node>
+        <node pkg="miro_football_perception" type="image_to_world.py" name="image_to_world" output="screen"></node>
+        <node pkg="miro_football_perception" type="look_at_ball.py" name="look_at_ball" output="screen"></node>
+        <node pkg="miro_football_perception" type="debug_camera.py" name="debug_camera" output="screen"></node>
+        <node pkg="miro_football_perception" type="accepted_balls.py" name="debug_accepted_balls" output="screen"></node>
+        <node pkg="miro_football_perception" type="rejected_balls.py" name="debug_rejected_balls" output="screen"></node>
+        <node pkg="miro_football_perception" type="debug_pitch.py" name="debug_pitch" output="screen"></node>
+        <node pkg="miro_football_perception" type="read_observations.py" name="read_observations" output="screen"></node>
+        <node pkg="miro_football_perception" type="estimate_velocity.py" name="estimate_velocity" output="screen"></node>
+        <node pkg="miro_football_perception" type="ball_trajectory.py" name="ball_trajectory" output="screen"></node>
+    </group>
+
+    <node pkg="miro_football_perception" type="publish_sim_ball.py" name="publish_sim_ball" output="screen"></node>
+    <node pkg="miro_football_perception" type="move_ball_server.py" name="move_ball_server" output="screen"></node>
+    <node pkg="miro_football_perception" type="scenarios.py" name="scenarios" output="screen"></node>
+</launch>

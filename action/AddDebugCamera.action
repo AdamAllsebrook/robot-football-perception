@@ -1,0 +1,7 @@
+sensor_msgs/Image ros_image
+int8 x
+int8 y
+---
+bool result
+---
+bool feedback

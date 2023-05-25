@@ -1,0 +1,10 @@
+\chapter{Conclusions}
+\label{chapter: 7}
+
+The overall goal of this project was to create a ball perception and trajectory prediction system that can run in real time on the MiRo robot. After researching existing implementations for similar systems in previous RoboCup competitions, a design for performing object detection of the ball was made. 
+
+This design used a circular Hough transform to extract possible ball candidates from images retrieved from MiRo's camera feed. The ball candidates were then run through a set of filters to remove any false positives, primarily a support vector machine classifier using the histogram of oriented gradients as a feature descriptor. Image space positions were converted to world space using a combination of robot kinematics and a correction to counteract the systematic error in camera calibration. Finally a Kalman filter was used to combine observations from both cameras with a predictive model of the ball position. This system worked well to produce accurate results within the strict time constraint of MiRo's limited processing power, with an average accuracy score across all scenarios of 90.8\%. 
+
+Ball velocity was estimated using an exponentially weighted moving average of previous ball positions. This system also worked fairly well to provide a sufficiently accurate estimation despite noise from the position estimation. Prediction of ball trajectory wall not implemented to a sufficient degree due to delays caused by computer vision problems in the previous parts of the project. 
+
+Overall the project was a success as it provides a solid foundation for a football perception system that could be used to eventually build a complete football playing system for the MiRo robot. 

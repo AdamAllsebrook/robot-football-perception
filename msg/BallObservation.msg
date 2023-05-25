@@ -1,0 +1,6 @@
+Header header
+geometry_msgs/Point world_position
+geometry_msgs/Point image_position
+float32 radius
+uint8 stream_index
+geometry_msgs/Point camera_position

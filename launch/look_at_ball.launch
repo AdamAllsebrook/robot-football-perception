@@ -1,0 +1,35 @@
+<launch>
+    <arg name="gazebo_ns" default="gazebo"/>
+    <arg name="debug" default="false"/>
+    <arg name="chase" default="-1"/>
+    <arg name="random" default="false"/>
+    <arg name="sim" default="true"/>
+
+    <group if="$(arg sim)">
+        <include file="$(find miro_football_perception)/launch/gazebo.launch">
+            <arg name="gazebo_ns" value="$(arg gazebo_ns)"/>
+        </include>
+    </group>
+
+    <include file="$(find miro_football_perception)/launch/miro.launch">
+        <arg name="miro_ns" value="miro1"/>
+        <arg name="init_pose" value="-x 0 -y 0 -z 0 -Y 0"/>
+        <arg name="gazebo_ns" value="$(arg gazebo_ns)"/>
+        <arg name="debug" value="$(arg debug)"/>
+        <arg name="chase_ball" value="$(arg chase)"/>
+    </include>
+
+    <!-- <include file="$(find miro_football_perception)/launch/miro.launch">
+        <arg name="miro_ns" value="miro2"/>
+        <arg name="init_pose" value="-x 1 -y 1 -z 0 -Y 3.14"/>
+        <arg name="gazebo_ns" value="$(arg gazebo_ns)"/>
+        <arg name="debug" value="$(arg debug)"/>
+        <arg name="chase_ball" value="$(arg chase)"/>
+    </include> -->
+
+    <node pkg="miro_football_perception" type="publish_sim_ball.py" name="publish_sim_ball" output="screen"></node>
+    <node pkg="miro_football_perception" type="set_sim_object.py" name="set_sim_object" output="screen"></node>
+    <group if="$(arg random)">
+        <node pkg="miro_football_perception" type="move_ball_random.py" name="move_ball_random" output="screen"></node>
+    </group>
+</launch>
